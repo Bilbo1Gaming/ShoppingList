@@ -22,10 +22,13 @@ COPY . .
 # copy production dependencies and source code into final image
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/src/index.ts .
+COPY --from=prerelease /usr/src/app/src/ /usr/src/app/src/
 COPY --from=prerelease /usr/src/app/package.json .
+
+# Make bun user the owner of the app
+RUN chown -R bun:bun /usr/src/app
 
 # run the app
 USER bun
 EXPOSE 5000
-CMD [ "bun", "run", "index.ts" ]
+CMD [ "bun", "run", "src/index.ts" ]

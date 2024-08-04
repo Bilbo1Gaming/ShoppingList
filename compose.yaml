@@ -1,0 +1,11 @@
+version: '3'
+services:
+  api:
+    build: .
+    ports:
+      - '5000:5000'
+    volumes:
+      - shopping-list:/usr/src/app/persist
+volumes:
+  shopping-list:
+    external: true

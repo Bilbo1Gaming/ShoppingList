@@ -1,19 +1,19 @@
 {
-  "name": "shoppinglist",
-  "module": "src/index.ts",
-  "type": "module",
-  "scripts": {
-    "stop": "docker stop shoppinglist-dev || true && docker rm shoppinglist-dev || true",
-    "d": "bun run stop && docker build --pull -t shoppinglist . && docker run -p 5000:5000 --name shoppinglist-dev shoppinglist"
-  },
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "fastify": "^4.28.1",
-    "zod": "^3.23.8"
-  }
+    "name": "shoppinglist",
+    "module": "src/index.ts",
+    "type": "module",
+    "scripts": {
+        "stop": "docker stop shoppinglist-dev || true && docker rm shoppinglist-dev || true",
+        "d": "docker compose up"
+    },
+    "devDependencies": {
+        "@types/bun": "latest"
+    },
+    "peerDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "fastify": "^4.28.1",
+        "zod": "^3.23.8"
+    }
 }
