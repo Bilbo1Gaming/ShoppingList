@@ -1,15 +1,15 @@
-import type { FastifyRequest } from "fastify";
+import db from "../utils/db";
 
 const jwt = require("jsonwebtoken");
 
-function signJWT(data: any) {
+export function signJWT(data: any) {
     return jwt.sign(data, process.env.JWT_SECRET, {
         expiresIn: "3h",
         issuer: process.env.JWT_ISSUER,
     });
 }
 
-function verifyJWT(data: any) {
+export function verifyJWT(data: any) {
     try {
         var decoded = jwt.verify(data, process.env.JWT_SECRET, {
             issuer: process.env.JWT_ISSUER,
@@ -20,45 +20,38 @@ function verifyJWT(data: any) {
     }
 }
 
-function isAuth(req: any, res: any, next: any) {
-    var token = req.cookies["authorisation"];
+export function isAuth(req: any, res: any, next: any) {
+    const email = req.headers["cf-access-authenticated-user-email"];
+    const ip = req.headers["cf-connecting-ip"];
 
-    if (!token && !Mtoken) {
-        console.log("Player auth failed. no token");
-        return res.redirect("/auth");
+    if (!email && !ip) {
+        console.log("User auth failed");
+        return res.code(401).send();
     }
 
-    let decoded = verifyJWT(token);
-    let Mdecoded = verifyJWT(Mtoken);
+    console.log("Authenticating....");
+    console.log(email);
+    console.log(ip);
 
-    if (!decoded && !Mdecoded) {
-        console.log("Player auth failed. not valid JWT");
-        return res.redirect("/auth");
+    // Check if user already exists in DB
+
+    let user = db.query(`SELECT * FROM users WHERE email = $email`).get({ email: email });
+    if (!user) {
+        console.log("New user with email:");
+        console.log(email);
     }
 
-    try {
-        var player = Player.find({ _id: decoded.id })[0];
-    } catch (error) {
-        player = {};
-    }
+    var id = "test";
+    var name = "testname";
 
-    try {
-        var manager = Manager.find({ _id: Mdecoded.id })[0];
-    } catch (error) {
-        manager = {};
-    }
+    console.log("Authenticated");
 
-    if (!player && !manager) {
-        console.log("Player auth failed. no player");
-        return res.redirect("/auth");
-    } else {
-        if (player["jwt"] == token) {
-            next();
-        } else if (manager["jwt"] == Mtoken) {
-            next();
-        } else {
-            console.log("Player auth failed. player JWT not match");
-            return res.redirect("/auth");
-        }
-    }
+    req.user = {
+        id: id,
+        name: name,
+        email: email,
+        ip: ip,
+    };
+
+    next();
 }
