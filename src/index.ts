@@ -10,15 +10,16 @@ import { z } from "zod";
 
 import db from "./utils/db";
 
-db.exec("PRAGMA journal_mode = WAL;");
 console.log(db.query("SELECT $message").all({ message: "Hello from DB" }));
 
-import { isAuth } from "./utils/auth";
+import { getUserData as getUserData } from "./utils/auth";
 
-fastify.get("/", { preHandler: [isAuth] }, async (req, res) => {
-    console.log("Request");
-    console.log(req.user);
-    return "hello world";
+// Routes
+fastify.register(require("./routes/user"), { prefix: "/api/user" });
+
+//
+fastify.get("/status", { preHandler: [getUserData] }, async (req, res) => {
+    return { status: "online" };
 });
 
 try {

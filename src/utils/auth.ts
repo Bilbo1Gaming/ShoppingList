@@ -1,4 +1,7 @@
+import type { User } from "../schema/user";
 import db from "../utils/db";
+
+import { v4 as uuidv4 } from "uuid";
 
 const jwt = require("jsonwebtoken");
 
@@ -20,7 +23,7 @@ export function verifyJWT(data: any) {
     }
 }
 
-export function isAuth(req: any, res: any, next: any) {
+export function getUserData(req: any, res: any, next: any) {
     const email = req.headers["cf-access-authenticated-user-email"];
     const ip = req.headers["cf-connecting-ip"];
 
@@ -35,23 +38,23 @@ export function isAuth(req: any, res: any, next: any) {
 
     // Check if user already exists in DB
 
-    let user = db.query(`SELECT * FROM users WHERE email = $email`).get({ email: email });
+    let user: Partial<User> = db.query(`SELECT * FROM users WHERE email = $email`).get({ email: email })!;
     if (!user) {
-        console.log("New user with email:");
-        console.log(email);
+        console.log("Made New user with id:");
+        const uuid = uuidv4();
+        console.log(uuid);
+        user = {
+            id: uuid,
+            name: email,
+            email: email,
+        };
+        db.query(`INSERT INTO users (id, name, email) VALUES ($id, $name, $email) `).run(user);
     }
-
-    var id = "test";
-    var name = "testname";
 
     console.log("Authenticated");
 
-    req.user = {
-        id: id,
-        name: name,
-        email: email,
-        ip: ip,
-    };
+    user.ip = ip;
+    req.user = user;
 
     next();
 }
