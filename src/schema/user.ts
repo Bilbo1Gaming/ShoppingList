@@ -8,7 +8,6 @@ export const UserSchema = z.object({
 });
 
 export const UserUpdateSchema = z.object({
-    id: z.string(),
     data: UserSchema.partial(),
 });
 
