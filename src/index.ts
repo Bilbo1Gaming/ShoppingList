@@ -32,6 +32,7 @@ db.exec("PRAGMA journal_mode = WAL;");
 console.log(db.query("SELECT $message").all({ message: "Hello from DB" }));
 
 fastify.get("/", async (req, res) => {
+    console.log(req.headers);
     return "hello world";
 });
 

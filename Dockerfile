@@ -22,7 +22,8 @@ COPY . .
 # copy production dependencies and source code into final image
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/src/ /usr/src/app/src/
+COPY --from=prerelease /usr/src/app/src/ ./src
+COPY --from=prerelease /usr/src/app/start.sh .
 COPY --from=prerelease /usr/src/app/package.json .
 
 # Make bun user the owner of the app
@@ -30,6 +31,5 @@ RUN chown -R bun:bun /usr/src/app
 RUN chmod 777 /usr/src/app
 
 # run the app
-USER bun
 EXPOSE 5000
-CMD [ "bun", "run", "src/index.ts" ]
+CMD  ["sh", "start.sh"]

@@ -6,6 +6,8 @@ services:
       - '5000:5000'
     volumes:
       - shopping-list:/usr/src/app/persist
+    env_file:
+      - .env
 volumes:
   shopping-list:
     external: true
