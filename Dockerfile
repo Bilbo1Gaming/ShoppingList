@@ -27,6 +27,7 @@ COPY --from=prerelease /usr/src/app/package.json .
 
 # Make bun user the owner of the app
 RUN chown -R bun:bun /usr/src/app
+RUN chmod 777 /usr/src/app
 
 # run the app
 USER bun

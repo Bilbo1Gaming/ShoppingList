@@ -9,14 +9,27 @@ const fastify: FastifyInstance = Fastify({
 import { z } from "zod";
 
 import { Database } from "bun:sqlite";
-try {
-    const db = new Database("./persist/db.sqlite", { create: true, strict: true });
 
-    console.log(db.query("SELECT $message").all({ message: "Hello from DB" }));
-} catch (error) {
-    console.error("There was an issue connecting to the DB", error);
-    process.exit(1);
+function initializeDatabase() {
+    try {
+        const db = new Database("./persist/db.sqlite", {
+            create: true,
+            strict: true,
+            readwrite: true,
+            readonly: false,
+        });
+        console.log("Database connected successfully");
+        return db;
+    } catch (error) {
+        console.error("There was an issue connecting to the DB", error);
+        process.exit(1);
+    }
 }
+
+const db = initializeDatabase();
+
+db.exec("PRAGMA journal_mode = WAL;");
+console.log(db.query("SELECT $message").all({ message: "Hello from DB" }));
 
 fastify.get("/", async (req, res) => {
     return "hello world";
